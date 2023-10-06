@@ -8,7 +8,9 @@ package tp13g3;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,6 +22,7 @@ public class TP13G3 {
     /**
      * @param args the command line arguments
      */
+    @SuppressWarnings("empty-statement")
     public static void main(String[] args) throws SQLException {
         try {
 
@@ -44,22 +47,47 @@ public class TP13G3 {
 //                       +"         (2,'matematicas',3,true),"
 //                       +"         (3,'ingles',2,true)";
 //                       
-                String sql = "INSERT INTO inscripcion(idInscripto, nota, idAlumno, idMateria)"
-                        +  "VALUES (1,9,14,4),"
-                        +  "       (2,8,15,1),"
-                       +  "       (3,7,16,3)";
-            PreparedStatement ps = con.prepareStatement(sql);
-            int filas = ps.executeUpdate();
-            if (filas > 0) {
-                JOptionPane.showMessageDialog(null, "Alumno Agregado");
-            }
-        } catch (ClassNotFoundException ex) {
+//                String sql = "INSERT INTO inscripcion(idInscripto, nota, idAlumno, idMateria)"
+//                        +  "VALUES (1,9,14,4),"
+//                        +  "       (2,8,15,1),"
+//                       +  "       (3,7,16,3),"
+//                         +  "       (4,7,14,1),"
+//                         +  "       (5,9,15,4),"
+//                         +  "       (6,5,16,2)";
+//            PreparedStatement ps = con.prepareStatement(sql);
+
+            String sql ="SELECT DISTINCT alumno. *,materia.nombre FROM alumno JOIN inscripcion on (alumno.idAlumno = inscripcion.idAlumno)"
+            + "JOIN materia ON(materia.idMateria = inscripcion.idMateria)"
+           + "where inscripcion.nota > 8";
+           PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs=ps.executeQuery();
+
+           while (rs.next()){
+                int id = rs.getInt("idAlumno");
+                int dni =rs.getInt("dni");
+                String apellido=rs.getString("apellido");
+                String nombre =rs.getString("nombre");
+                LocalDate fechN =rs.getDate("fechaDeNacimiento").toLocalDate();
+                boolean estado = rs.getBoolean("estado");
+                System.out.println("Nombre: "+nombre+apellido);
+                System.out.println("id: "+id);
+                System.out.println("dni: "+dni);
+                System.out.println("fecha; : "+fechN.toString());
+                System.out.println("estado: "+estado);
+           }
+            
+            
+//            int filas = ps.executeUpdate();
+//                if (filas > 0) {
+//                    JOptionPane.showMessageDialog(null, "datos Agregados");
+//                }
+            }catch (ClassNotFoundException ex) {
             JOptionPane.showMessageDialog(null, "Error al cargar Driver");
-        } catch (SQLException ex) {
+        }catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error de conexión");
 
             int error = ex.getErrorCode();
-
+ex.printStackTrace();
             if (error == 1146) {
                 JOptionPane.showMessageDialog(null, "Tabla inexistente");
             } else if (error == 1062) {
@@ -70,5 +98,5 @@ public class TP13G3 {
                 JOptionPane.showMessageDialog(null, "Error SQL");
             }
         }
+        }
     }
-}
